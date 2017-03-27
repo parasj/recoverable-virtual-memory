@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <dirent.h>
+#include <sys/stat.h>
 
 rvm_t rvm_init(const char *directory) {
     rvm_t rvm;
@@ -37,7 +37,8 @@ void rvm_destroy(rvm_t rvm, const char *segname) {
 }
 
 trans_t rvm_begin_trans(rvm_t rvm, int numsegs, void **segbases) {
-    return (trans_t)* malloc(sizeof(trans_t));
+    trans_t trans;
+    return trans;
 }
 
 void rvm_about_to_modify(trans_t tid, void *segbase, int offset, int size) {

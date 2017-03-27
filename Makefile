@@ -4,7 +4,7 @@ SRC = src/rvm.c
 OBJ = $(SRC:.c=.o)
 CFLAGS = -fPIC -ggdb -Wall -Wextra -std=gnu99
 OUT = librvm.a
-LDFLAGS = -Isrc -L bin -l:${OUT}
+LDFLAGS = -Isrc -Lbin -lrvm
 
 all: ${OUT} abort basic multi-abort multi truncate
 
