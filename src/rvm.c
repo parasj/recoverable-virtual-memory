@@ -25,7 +25,21 @@ rvm_t rvm_init(const char *directory) {
 }
 
 void *rvm_map(rvm_t rvm, const char *segname, int size_to_create) {
+    /* 
+        if (!file_exists(sement_file)) { // make the file
+            segment_t seg;
 
+            seg.size = size_to_create;
+            seg.addr = (char *) malloc(size_to_create);
+            seg.name = (char*) malloc(sizeof(segname));
+            strcpy(seg.name, segname);
+            
+            create_new_segment_file(segment_file);
+            append_to_segments_list(seg);
+        } else { // file exits
+            // ???
+        }
+    */
 }
 
 void rvm_unmap(rvm_t rvm, void *segbase) {
