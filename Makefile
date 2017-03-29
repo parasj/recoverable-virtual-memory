@@ -2,17 +2,15 @@ CC = gcc
 LIBS = .
 SRC = src/rvm.c 
 OBJ = $(SRC:.c=.o)
-CFLAGS = -fPIC -ggdb -Wall -Wextra -std=gnu99
-OUT = librvm.a
-LDFLAGS = -Isrc -Lbin -lrvm
+CFLAGS = -fPIC -ggdb -Wall -Wextra -std=gnu99 -v
+LDFLAGS = -Isrc -Lsrc
 
-all: ${OUT} abort basic multi-abort multi truncate
+all: rvm abort basic multi-abort multi truncate
+
+rvm: $(SRC:.c=.o)
 
 .c.o:
 	$(CC) $(CFLAGS) -c $< -o $@
-
-$(OUT): $(OBJ)
-	ar rcs ./bin/$(OUT) $(OBJ)
 
 abort: testcase/abort.c ${OBJ} ${OUT}
 	$(CC) $(CFLAGS) testcase/abort.c -o bin/abort ${LDFLAGS}
