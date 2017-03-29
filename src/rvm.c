@@ -3,7 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <fcntl.h>
 #include <sys/stat.h>
+#include <sys/types.h>
+
+static struct segment_list segments;
 
 rvm_t rvm_init(const char *directory) {
     rvm_t rvm;
@@ -19,27 +23,45 @@ rvm_t rvm_init(const char *directory) {
     }
 
     rvm.directory = directory;
-    // todo create log file if it doesn't exist
+    // rvm.commit_log_file = 
+
+    LIST_INIT(&segments);
 
     return rvm;
 }
 
 void *rvm_map(rvm_t rvm, const char *segname, int size_to_create) {
-    /* 
-        if (!file_exists(sement_file)) { // make the file
-            segment_t seg;
+    segment_t seg;
 
-            seg.size = size_to_create;
-            seg.addr = (char *) malloc(size_to_create);
-            seg.name = (char*) malloc(sizeof(segname));
-            strcpy(seg.name, segname);
-            
-            create_new_segment_file(segment_file);
-            append_to_segments_list(seg);
-        } else { // file exits
-            // ???
+    char seg_path[512];
+    strcat(seg_path, rvm.directory);
+    strcat(seg_path, "/");
+    strcat(seg_path, segname);
+    strcat(seg_path, ".seg");
+    
+    if (access(seg_path, F_OK) != -1) {
+        fprintf(stdout, "Non-implemented\n");
+        exit(1);
+    } else {
+        // init segment data structures
+        seg.seg_size = size_to_create;
+        seg.seg_addr = (char *) malloc(size_to_create);
+        seg.seg_name = (char *) malloc(sizeof(segname));
+        strcpy(seg.seg_name, segname);
+
+        // touch the file
+        int fd = open(seg_path, O_RDWR | O_CREAT, 0770);
+        if (fd != -1) {
+            close(fd);
         }
-    */
+
+        // insert into segment list
+        segment_t *seg_copy = (segment_t *) malloc(sizeof(segment_t));
+        *seg_copy = seg;
+        LIST_INSERT_HEAD(&segments, seg_copy, next_seg);
+    }
+
+    return seg.seg_addr;
 }
 
 void rvm_unmap(rvm_t rvm, void *segbase) {

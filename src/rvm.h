@@ -1,6 +1,18 @@
 #ifndef RVM_H
 #define RVM_H
 
+#include <sys/queue.h>
+
+LIST_HEAD(segment_list, segment_t);
+
+typedef struct segment_t {
+	char* seg_name;
+	int seg_size;
+	void* seg_addr;
+
+	LIST_ENTRY(segment_t) next_seg;
+} segment_t;
+
 typedef struct rvm_t {
 	const char *directory;
     const char *commit_log_file;
