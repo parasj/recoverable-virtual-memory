@@ -14,8 +14,9 @@ typedef struct segment_t {
 } segment_t;
 
 typedef struct rvm_t {
-	const char *directory;
-    const char *commit_log_file;
+  const char *directory;
+  const char *commit_log_file;
+  struct segment_list segments;
 } rvm_t;
 
 typedef struct trans_t {
