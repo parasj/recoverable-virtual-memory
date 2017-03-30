@@ -7,6 +7,22 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
+segment_t * segbase_to_segment(rvm_t rvm, void *segbase) {
+  segment_t *i;
+  LIST_FOREACH(i, &rvm.segments, next_seg)
+    if(i->seg_addr == segbase)
+      return i;
+  return NULL;
+}
+
+segment_t * segname_to_segment(rvm_t rvm, const char *segname) {
+  segment_t *i;
+  LIST_FOREACH(i, &rvm.segments, next_seg)
+    if(strcmp(i->seg_name, segname) == 0)
+      return i;
+  return NULL;
+}
+
 rvm_t rvm_init(const char *directory) {
   rvm_t rvm;
 
@@ -41,9 +57,8 @@ void *rvm_map(rvm_t rvm, const char *segname, int size_to_create) {
 
   // mustn't remap a segment that's already been mapped
   segment_t *i;
-  LIST_FOREACH(i, &rvm.segments, next_seg)
-    if(strcmp(i->seg_name, segname) == 0)
-      return NULL;
+  if(segname_to_segment(rvm, segname) != NULL)
+    return NULL;
 
   if (access(seg_path, F_OK) == 0) {
     // crash recovery stuff happens here, since the backing
@@ -81,9 +96,8 @@ void *rvm_map(rvm_t rvm, const char *segname, int size_to_create) {
 }
 
 void rvm_unmap(rvm_t rvm, void *segbase) {
-  segment_t *i;
-  LIST_FOREACH(i, &rvm.segments, next_seg)
-    if(i->seg_addr == segbase) {
+  segment_t *i = segbase_to_segment(rvm, segbase);
+  if(i) {
       LIST_REMOVE(i, next_seg);
       free(i->seg_addr);
       free(i);
@@ -94,9 +108,8 @@ void rvm_unmap(rvm_t rvm, void *segbase) {
 void rvm_destroy(rvm_t rvm, const char *segname) {
   // mustn't destroy a segment that's mapped
   segment_t *i;
-  LIST_FOREACH(i, &rvm.segments, next_seg)
-    if(strcmp(i->seg_name, segname) == 0)
-      return;
+  if((i = segname_to_segment(rvm, segname)))
+    return;
 
   // not mapped, so we can delete the backing
   // file safely
@@ -110,43 +123,42 @@ void rvm_destroy(rvm_t rvm, const char *segname) {
 
 trans_t rvm_begin_trans(rvm_t rvm, int numsegs, void **segbases) {
   static trans_t trans_num = 0;
-  int found = 0;
   segment_t *seg;
 
   for(int i = 0; i < numsegs; i++) {
-    LIST_FOREACH(seg, &rvm.segments, next_seg)
-      if(seg->seg_addr == segbases[i]) {
-        found = 1;
-        if(seg->trans_id != 0) {
-          // segment already involved in a transaction
-          return -1;
-        }
-      }
-    if(!found) {
-        // segment not found in the rvm list
+    seg = segbase_to_segment(rvm, segbases[i]);
+    if(seg) {
+      if(seg->trans_id != 0) {
+        // segment already involved in a transaction
         return -1;
       }
+    } else {
+      // segment not found in the rvm list
+      return -1;
+    }
   }
 
   // all segments have been found in the list, none
   // of them are involved in transactions.
   trans_t trans_id = trans_num++;
   for(int i = 0; i < numsegs; i++) {
-    LIST_FOREACH(seg, &rvm.segments, next_seg)
-      if(seg->seg_addr == segbases[i]) {
-        seg->trans_id = trans_id;
-      }
+    seg = segbase_to_segment(rvm, segbases[i]);
+    // we know that seg is not null, because we already
+    // checked for that earlier
+    seg->trans_id = trans_id;
   }
 
   return trans_id;
 }
 
 void rvm_about_to_modify(trans_t tid, void *segbase, int offset, int size) {
-
+  // do the checks
+  // save stuff in the logs
 }
 
 void rvm_commit_trans(trans_t tid) {
-
+  // write stuff from the logs to the backing file
+  // clean the logs (truncate)
 }
 
 void rvm_abort_trans(trans_t tid) {
