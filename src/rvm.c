@@ -59,6 +59,7 @@ void *rvm_map(rvm_t rvm, const char *segname, int size_to_create) {
     exit(1);
   } else {
     // init segment data structures
+    seg.trans_id = 0;
     seg.seg_size = size_to_create;
     seg.seg_addr = (char *) malloc(size_to_create);
     seg.seg_name = (char *) malloc(sizeof(segname));
@@ -84,6 +85,7 @@ void rvm_unmap(rvm_t rvm, void *segbase) {
   LIST_FOREACH(i, &rvm.segments, next_seg)
     if(i->seg_addr == segbase) {
       LIST_REMOVE(i, next_seg);
+      free(i->seg_addr);
       free(i);
       return;
     }
@@ -107,8 +109,36 @@ void rvm_destroy(rvm_t rvm, const char *segname) {
 }
 
 trans_t rvm_begin_trans(rvm_t rvm, int numsegs, void **segbases) {
-  trans_t trans;
-  return trans;
+  static trans_t trans_num = 0;
+  int found = 0;
+  segment_t *seg;
+
+  for(int i = 0; i < numsegs; i++) {
+    LIST_FOREACH(seg, &rvm.segments, next_seg)
+      if(seg->seg_addr == segbases[i]) {
+        found = 1;
+        if(seg->trans_id != 0) {
+          // segment already involved in a transaction
+          return -1;
+        }
+      }
+    if(!found) {
+        // segment not found in the rvm list
+        return -1;
+      }
+  }
+
+  // all segments have been found in the list, none
+  // of them are involved in transactions.
+  trans_t trans_id = trans_num++;
+  for(int i = 0; i < numsegs; i++) {
+    LIST_FOREACH(seg, &rvm.segments, next_seg)
+      if(seg->seg_addr == segbases[i]) {
+        seg->trans_id = trans_id;
+      }
+  }
+
+  return trans_id;
 }
 
 void rvm_about_to_modify(trans_t tid, void *segbase, int offset, int size) {

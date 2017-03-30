@@ -5,10 +5,14 @@
 
 LIST_HEAD(segment_list, segment_t);
 
+typedef int trans_t;
+trans_t trans_id;
+
 typedef struct segment_t {
 	char* seg_name;
 	int seg_size;
 	void* seg_addr;
+  trans_t trans_id;
 
 	LIST_ENTRY(segment_t) next_seg;
 } segment_t;
@@ -18,10 +22,6 @@ typedef struct rvm_t {
   const char *commit_log_file;
   struct segment_list segments;
 } rvm_t;
-
-typedef struct trans_t {
-	int trans_id;
-} trans_t;
 
 rvm_t rvm_init(const char *directory);
 void *rvm_map(rvm_t rvm, const char *segname, int size_to_create);
