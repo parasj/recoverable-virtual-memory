@@ -18,14 +18,18 @@ typedef struct segment_t {
 	LIST_ENTRY(segment_t) next_seg;
 } segment_t;
 
-
 typedef struct range_t {
-  trans_t tid;
-  void* segbase;
+  int tid;
   int offset;
   int size;
-  void* data;
   int is_undo;
+  short is_backed;
+  int namesize;
+  void* segbase;
+  void* data;
+  char *segname;
+  // all pointers are invalidated
+  // on file read/write, remember
   LIST_ENTRY(range_t) next_range;
 } range_t;
 

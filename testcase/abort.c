@@ -11,7 +11,6 @@
 #define TEST_STRING2 "bleg!"
 #define OFFSET2 1000
 
-
 int main(int argc, char **argv)
 {
      rvm_t rvm;
@@ -65,4 +64,3 @@ int main(int argc, char **argv)
      printf("OK\n");
      exit(0);
 }
-

@@ -6,6 +6,7 @@ CFLAGS = -fPIC -ggdb -Wall -Wextra -std=gnu99
 LDFLAGS = -Isrc -Lsrc src/rvm.o
 
 all: rvm abort basic multi-abort multi truncate
+	rm -rf bin/rvm_segments
 	rm -rf src/rvm.o
 
 rvm: $(SRC:.c=.o)
