@@ -4,6 +4,7 @@
 #include <sys/queue.h>
 
 LIST_HEAD(segment_list, segment_t);
+LIST_HEAD(range_list, range_t);
 
 typedef int trans_t;
 trans_t trans_id;
@@ -17,11 +18,26 @@ typedef struct segment_t {
 	LIST_ENTRY(segment_t) next_seg;
 } segment_t;
 
+
+typedef struct range_t {
+  trans_t tid;
+  void* segbase;
+  int offset;
+  int size;
+  void* data;
+  int is_undo;
+  LIST_ENTRY(range_t) next_range;
+} range_t;
+
 typedef struct rvm_t {
   const char *directory;
-  const char *commit_log_file;
-  struct segment_list segments;
 } rvm_t;
+
+// need structures to represent logfile data
+// transaction header (just the id?)
+// range header (segbase, offset, size)
+// data
+// end mark
 
 rvm_t rvm_init(const char *directory);
 void *rvm_map(rvm_t rvm, const char *segname, int size_to_create);

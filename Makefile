@@ -2,10 +2,11 @@ CC = gcc
 LIBS = .
 SRC = src/rvm.c 
 OBJ = $(SRC:.c=.o)
-CFLAGS = -fPIC -ggdb -Wall -Wextra -std=gnu99 -v
-LDFLAGS = -Isrc -Lsrc
+CFLAGS = -fPIC -ggdb -Wall -Wextra -std=gnu99
+LDFLAGS = -Isrc -Lsrc src/rvm.o
 
 all: rvm abort basic multi-abort multi truncate
+	rm -rf src/rvm.o
 
 rvm: $(SRC:.c=.o)
 
