@@ -1,0 +1,89 @@
+\documentclass[paper=a4,fontsize=11pt]{report} % A4 paper and 11pt font size
+
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
+\usepackage{graphicx} % For pictures
+\usepackage{booktabs} % For tables
+\usepackage{tabularx} % For tables
+\usepackage[english]{babel} % English language/hyphenation
+\usepackage{amsmath,amsfonts,amsthm} % Math packages
+
+\usepackage[margin=1.5in]{geometry}
+
+\usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
+
+\usepackage{sectsty} % Allows customizing section commands
+\allsectionsfont{\centering \normalfont\scshape} % Make all sections centered, the default font and small caps
+
+\usepackage{fancyhdr} % Custom headers and footers
+\pagestyle{fancyplain} % Makes all pages in the document conform to the custom headers and footers
+\fancyhead{} % No page header - if you want one, create it in the same way as the footers below
+\fancyfoot[L]{} % Empty left footer
+\fancyfoot[C]{} % Empty center footer
+\fancyfoot[R]{\thepage} % Page numbering for right footer
+\renewcommand{\headrulewidth}{0pt} % Remove header underlines
+\renewcommand{\footrulewidth}{0pt} % Remove footer underlines
+\setlength{\headheight}{13.6pt} % Customize the height of the header
+
+\numberwithin{equation}{section} % Number equations within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{figure}{section} % Number figures within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+\numberwithin{table}{section} % Number tables within sections (i.e. 1.1, 1.2, 2.1, 2.2 instead of 1, 2, 3, 4)
+
+% \setlength\parindent{0pt} % Removes all indentation from paragraphs - comment this line for an assignment with lots of text
+
+\renewcommand{\thesection}{\arabic{section}}
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\newcommand{\horrule}[1]{\rule{\linewidth}{#1}} % Create horizontal rule command with 1 argument of height
+
+\title{	
+\normalfont \normalsize 
+\textsc{Georgia Institute of Technology} \\ [25pt] % Your university, school and/or department name(s)
+\horrule{0.5pt} \\[0.4cm] % Thin top horizontal rule
+\Huge Recoverable Virtual Memory \\ \huge CS 6210 Project 3 Report\\ % The assignment title
+\horrule{2pt} \\[0.5cm] % Thick bottom horizontal rule
+}
+
+\author{Paras Jain, Manas George}
+\date{}
+
+\begin{document}
+
+\maketitle % Print the title
+
+\section{Project goal}
+The aim of this project is to implement a recoverable virtual memory system. This system allows users to manage peristent memory using a transaction-based API. This mechanism allows clients to create applications with persistant and consistent data structures (e.g. a database).
+
+\section{API}
+
+\begin{enumerate}
+  \item \texttt{rvm\_init}: initializes the log files and directory for the VM system
+  \item \texttt{rvm\_map}: maps a segment file on disk to area in memory
+  \item \texttt{rvm\_unmap}: unmaps a segment from memory
+  \item \texttt{rvm\_destroy}: cleans up the backing store for a segment
+  \item \texttt{rvm\_begin\_trans}: creates a transaction
+  \item \texttt{rvm\_about\_to\_modify}: notifies library about intended modification to segment of memory
+  \item \texttt{rvm\_commit\_trans}: commits the transaction to disk
+  \item \texttt{rvm\_abort\_trans}: undo all modifications during a trasaction
+  \item \texttt{rvm\_truncate\_log}: shrink the log file and write log data
+  \item \texttt{rvm\_verbose}: control log verbosity
+\end{enumerate}
+
+\section{RVM design and implementation}
+Upon calling \texttt{rvm\_init}, a directory is created if it does not exist along with a log file. Relevant segement list data structures are created as well. When a mapping is created with \texttt{rvm_map}, a segment file is created if it does not exist. This file stores the memory segment in raw binary format.
+
+Upon creating a transaction, a new transaction ID is created. This transaction ID is checked to prevent multiple transactions from editing the same segment. Calling \texttt{rvm\_about\_to\_modify} creates a range record. Upon commit, the ranges are actually written out to the log file. Finally, in truncate, we read each item from the log file and then apply the changes and write back the data to disk.
+
+\subsection{RVM data structures}
+
+
+
+% \begin{figure}[b!]
+%   \includegraphics[width=\linewidth]{img/ll.png}
+%   \caption{Server data structures}
+% \end{figure}
+
+\end{document}
