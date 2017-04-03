@@ -1,4 +1,4 @@
-This is LuaTeX, Version 0.95.0 (TeX Live 2016)  (format=lualatex 2016.5.22)  2 APR 2017 23:47
+This is LuaTeX, Version 0.95.0 (TeX Live 2016)  (format=lualatex 2016.5.22)  3 APR 2017 19:33
  restricted system commands enabled.
 **report.tex
 (./report.tex
@@ -513,10 +513,6 @@ es
 \f@ncyO@olf=\skip58
 \f@ncyO@orf=\skip59
 )
-
-LaTeX Warning: Unused global option(s):
-    [paper=a4,fontsize=11pt].
-
 (./report.aux)
 \openout1 = report.aux
 
@@ -692,110 +688,46 @@ LaTeX Font Info:    Try loading font information for T1+cmtt on input line 63.
 (/usr/local/texlive/2016/texmf-dist/tex/latex/base/t1cmtt.fd
 File: t1cmtt.fd 2014/09/29 v2.5h Standard LaTeX font definitions
 )
-! Missing $ inserted.
-<inserted text> 
-$
-l.76 ...n a mapping is created with \texttt{rvm_map}
-                                                  , a segment file is create...
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
-
-LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 9.19998pt on input line 76.
-LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 6.99199pt on input line 76.
-LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
-(Font)              scaled to size 5.51999pt on input line 76.
-LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 9.19998pt on input line 76.
-LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 6.99199pt on input line 76.
-LaTeX Font Info:    Font shape `U/futm/m/n' will be
-(Font)              scaled to size 5.51999pt on input line 76.
-! Extra }, or forgotten $.
-<recently read> \egroup 
-        
-l.76 ...n a mapping is created with \texttt{rvm_map}
-                                                  , a segment file is create...
-I've deleted a group-closing symbol because it seems to be
-spurious, as in `$x}$'. But perhaps the } is legitimate and
-you forgot something else, as in `\hbox{$x}'. In such cases
-the way to recover is to insert both the forgotten and the
-deleted material, e.g., by typing `I$}'.
-
-! Missing $ inserted.
-<inserted text> 
-$
-l.77 
-   
-I've inserted a begin-math/end-math symbol since I think
-you left one out. Proceed, with fingers crossed.
-
-
-Overfull \hbox (422.88728pt too wide) in paragraph at lines 76--77
-\T1/futs/m/n/10 sege-ment list data struc-tures are cre-ated as well. When a ma
-p-ping is cre-ated with \T1/cmtt/m/n/10 rvm$[][]\FML/futmi/m/it/10 ap; asegment
-fileiscreatedifitdoesnotexist:Thisfilestoresthememorysegmentinrawbinaryformat:$
- 
- []
-
-
-Overfull \hbox (32.16374pt too wide) in paragraph at lines 78--79
-[]\T1/cmtt/m/n/10 Upon creating a transaction, a new transaction ID is created.
- This transaction
- []
-
-
-Overfull \hbox (6.6663pt too wide) in paragraph at lines 78--79
-\T1/cmtt/m/n/10 ID is checked to prevent multiple transactions from editing the
- same segment.
- []
-
-
-Overfull \hbox (1.41759pt too wide) in paragraph at lines 78--79
-\T1/cmtt/m/n/10 Calling rvm_about_to_modify creates a range record. Upon commit
-, the ranges
- []
-
-
-Overfull \hbox (6.6663pt too wide) in paragraph at lines 78--79
-\T1/cmtt/m/n/10 are actually written out to the log file. Finally, in truncate,
- we read each
- []
-
-
-Overfull \hbox (1.41759pt too wide) in paragraph at lines 78--79
-\T1/cmtt/m/n/10 item from the log file and then apply the changes and write bac
-k the data to
+Overfull \hbox (0.76025pt too wide) in paragraph at lines 68--69
+[]\T1/cmtt/m/n/10 rvm_about_to_modify\T1/futs/m/n/10 : no-ti-fies li-brary abou
+t in-cip-i-ent mod-i-fi-ca-tion to mem-ory seg-ments 
  []
 
 LaTeX Font Info:    Font shape `T1/futs/bx/n' in size <12> not available
-(Font)              Font shape `T1/futs/b/n' tried instead on input line 80.
-[1] (./report.aux))
-(\end occurred inside a group at level 1)
-
-### simple group (level 1) entered at line 76 ({)
-### bottom level
+(Font)              Font shape `T1/futs/b/n' tried instead on input line 82.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 9.19998pt on input line 90.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 6.99199pt on input line 90.
+LaTeX Font Info:    Font shape `FMX/futm/m/n' will be
+(Font)              scaled to size 5.51999pt on input line 90.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 9.19998pt on input line 90.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 6.99199pt on input line 90.
+LaTeX Font Info:    Font shape `U/futm/m/n' will be
+(Font)              scaled to size 5.51999pt on input line 90.
+[1] [2] (./report.aux))
 
 Here is how much of LuaTeX's memory you used:
- 5206 strings out of 495119
+ 5198 strings out of 495119
  100000,266212 words of node,token memory allocated
- 592 words of node memory still in use:
-   5 hlist, 2 vlist, 2 rule, 30 glue, 1 kern, 1 glyph, 45 glue_spec, 1 write nod
+ 669 words of node memory still in use:
+   5 hlist, 2 vlist, 2 rule, 40 glue, 1 kern, 3 glyph, 44 glue_spec, 1 write nod
 es
-   avail lists: 2:14,3:138,4:5,5:193,6:1509,7:439,8:91,9:95,10:4,11:82
- 8262 multiletter control sequences out of 65536+600000
+   avail lists: 2:14,3:75,4:19,5:262,6:2936,7:743,8:6,9:112,10:14,11:250
+ 8258 multiletter control sequences out of 65536+600000
  136 fonts using 5629847 bytes
- 38i,10n,43p,416b,278s stack positions out of 5000i,500n,10000p,200000b,100000s
+ 38i,10n,43p,1028b,232s stack positions out of 5000i,500n,10000p,200000b,100000s
 {/usr/local/texlive/2016/texmf-dist/fonts/enc/dvips/base/8r.enc}{/usr/local/texl
 ive/2016/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}</usr/local/texlive
 /2016/texmf-dist/fonts/type1/adobe/utopia/putr8a.pfb></usr/local/texlive/2016/te
 xmf-dist/fonts/type1/adobe/utopia/putri8a.pfb></usr/local/texlive/2016/texmf-dis
 t/fonts/type1/public/cm-super/sftt1000.pfb>
-Output written on report.pdf (2 pages, 64088 bytes).
+Output written on report.pdf (3 pages, 62006 bytes).
 
-PDF statistics: 25 PDF objects out of 1000 (max. 8388607)
- 17 compressed objects within 1 object stream
+PDF statistics: 28 PDF objects out of 1000 (max. 8388607)
+ 19 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 131072)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

@@ -1,4 +1,4 @@
-\documentclass[paper=a4,fontsize=11pt]{report} % A4 paper and 11pt font size
+\documentclass{report} % A4 paper and 11pt font size [paper=letter,fontsize=12pt]
 
 \usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
 \usepackage{fourier} % Use the Adobe Utopia font for the document - comment this line to return to the LaTeX default
@@ -65,25 +65,34 @@ The aim of this project is to implement a recoverable virtual memory system. Thi
   \item \texttt{rvm\_unmap}: unmaps a segment from memory
   \item \texttt{rvm\_destroy}: cleans up the backing store for a segment
   \item \texttt{rvm\_begin\_trans}: creates a transaction
-  \item \texttt{rvm\_about\_to\_modify}: notifies library about intended modification to segment of memory
+  \item \texttt{rvm\_about\_to\_modify}: notifies library about incipient modification to memory segments
   \item \texttt{rvm\_commit\_trans}: commits the transaction to disk
   \item \texttt{rvm\_abort\_trans}: undo all modifications during a trasaction
   \item \texttt{rvm\_truncate\_log}: shrink the log file and write log data
   \item \texttt{rvm\_verbose}: control log verbosity
 \end{enumerate}
 
-\section{RVM design and implementation}
-Upon calling \texttt{rvm\_init}, a directory is created if it does not exist along with a log file. Relevant segement list data structures are created as well. When a mapping is created with \texttt{rvm_map}, a segment file is created if it does not exist. This file stores the memory segment in raw binary format.
 
-Upon creating a transaction, a new transaction ID is created. This transaction ID is checked to prevent multiple transactions from editing the same segment. Calling \texttt{rvm\_about\_to\_modify} creates a range record. Upon commit, the ranges are actually written out to the log file. Finally, in truncate, we read each item from the log file and then apply the changes and write back the data to disk.
+\section{RVM design and implementation}
+Upon calling \texttt{rvm\_init}, a directory is created if it does not exist along with a log file. Relevant segement list data structures are created as well. When a mapping is created with \texttt{rvm\_map}, a segment file is created if it does not exist. This file stores the memory segment in raw binary format. When creating a transaction, a new transaction ID is created. This transaction ID is checked to prevent multiple transactions from editing the same segment. Calling \texttt{rvm\_about\_to\_modify} creates a range record. Upon commit, the ranges are actually written out to the log file. Finally, in truncate, we read each item from the log file and then apply the changes and write back the data to disk.
+
+This architecture keeps the code simple, which helps ensure that our implementation is more likely to be correct. Give
+
 
 \subsection{RVM data structures}
 
 
 
-% \begin{figure}[b!]
-%   \includegraphics[width=\linewidth]{img/ll.png}
-%   \caption{Server data structures}
-% \end{figure}
+\section{Analysis of design tradeoffs}
+
+Our implementation is simple which keeps the code relatively bug-free. All library code lives in \texttt{rvm.c} in several interface methods, outlined in the API section. Total implementation is on the order of about 350 LOC. This has positive benefits for the library, notably security and verifiability. However, this led to some potential underutilized performance optimizations.
+
+For example, segments are stored in a single global segment list. Operations on this segment list are on the order of $O(n)$ as each access requires traversing the list to find the relevant segment metadata struct. Using a list keeps implementation simpler and more secure. The list uses \texttt{sys/queue.h} which is a very well tested and robust list implementation using compiler macros. However, we could use a hashmap datastructure (e.g. Google sparse hash) which would have an constant access overhead. Looking though the examples, we decided that most implementations did not use a large enough number of segments to make such an optimization worthwhile. Given that our RVM library is intended to be linked directly into the client application as compared to a system-wide service, segment lists would be scoped to the context of a single application and therefore should not be an issue for the kinds of clients using our library. We therefore avoid needing to link another third-party library into our code.
+
+There are several optimization that could further improve performance of the application. The log currently is read and written to using \texttt{fread}. This interface is performant but incurs the cost of a system call for every \texttt{range\_t} item in the log. A faster approach would be to \texttt{mmap} the transaction log which would batch reads to a system-page granularity. This would also have the added benefit of potentially allowing for page-sharing between clients in the future. It is also likely recently written entries in the transaction log will be read shortly after - \texttt{mmap} would benefit from this as those pages would likely still be cached in memory.
+
+It would also make sense to automatically truncate the log if the logfile grows beyond a certain threshold.
+
+
 
 \end{document}
