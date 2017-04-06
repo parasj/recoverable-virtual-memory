@@ -19,6 +19,8 @@ int main(int argc, char **argv)
      trans_t trans;
      
      rvm = rvm_init("rvm_segments");
+
+     rvm_verbose(0);
      
      rvm_destroy(rvm, "testseg");
      

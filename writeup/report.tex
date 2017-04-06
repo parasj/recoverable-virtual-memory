@@ -7,7 +7,7 @@
 \usepackage{tabularx} % For tables
 \usepackage[english]{babel} % English language/hyphenation
 \usepackage{amsmath,amsfonts,amsthm} % Math packages
-
+\usepackage{listings}
 \usepackage[margin=1.5in]{geometry}
 
 \usepackage{lipsum} % Used for inserting dummy 'Lorem ipsum' text into the template
@@ -81,6 +81,53 @@ This architecture keeps the code simple, which helps ensure that our implementat
 
 \subsection{RVM data structures}
 
+\subsubsection{Segments}
+Segments are stored in a global segment list. This is a linked list based on the \texttt{segment\_t} struct. In this segment, we store segment size, name and address.
+
+\vbox{%
+\begin{lstlisting}[language=C]
+typedef struct segment_t {
+  char* seg_name;
+  int seg_size;
+  void* seg_addr;
+  trans_t trans_id;
+
+  LIST_ENTRY(segment_t) next_seg;
+} segment_t;
+
+struct segment_list segments;
+\end{lstlisting}}
+
+
+\subsubsection{Ranges}
+Ranges represent operations on a range of memory. These transactions are used as atomic blocks which allow for undo functionality. These ranges are allocated when a transaction is created (for the undo log) and whenver a client is about to modify something.
+
+\vbox{%
+\begin{lstlisting}[language=C]
+typedef struct range_t {
+  int tid;
+  int offset;
+  int size;
+  int is_undo;
+  short is_backed;
+  int namesize;
+  void* segbase;
+  void* data;
+  char *segname;
+
+  LIST_ENTRY(range_t) next_range;
+} range_t;
+\end{lstlisting}}
+
+
+\subsubsection{Log files}
+The commit log file is stored in \texttt{/.rvm.log}. This file stores a list of entries corresponding to transaction commit records. When \texttt{rvm\_commit\_trans} is called, relevant regions are written to the logfile. We copy the updated memory region to the \texttt{range\_t} data structure and then write to the file.
+
+The file is in binary format for speed of processing. An entry in the log is a binary string as follows: \texttt{<range\_t entry> <segname> <data>}. This saves the metadata for the entry with the associated data that the metadata points to. This is sufficient to apply the transactions against the persistent backing file.
+
+
+\subsubsection{Undo records}
+\texttt{rvm\_about\_to\_modify} notfies the library to save an undo record. This saves a \texttt{range\_t} entry into a linked list in memory. This allows cancelling a transaction and restoring previous state, simply by copying back the undo record data.
 
 
 \section{Analysis of design tradeoffs}
@@ -91,8 +138,8 @@ For example, segments are stored in a single global segment list. Operations on 
 
 There are several optimization that could further improve performance of the application. The log currently is read and written to using \texttt{fread}. This interface is performant but incurs the cost of a system call for every \texttt{range\_t} item in the log. A faster approach would be to \texttt{mmap} the transaction log which would batch reads to a system-page granularity. This would also have the added benefit of potentially allowing for page-sharing between clients in the future. It is also likely recently written entries in the transaction log will be read shortly after - \texttt{mmap} would benefit from this as those pages would likely still be cached in memory.
 
-It would also make sense to automatically truncate the log if the logfile grows beyond a certain threshold.
+It would also make sense to automatically truncate the log if the logfile grows beyond a certain threshold. We opted to allow the user control of this functionality.
 
-
+Actually truncating the transaction log is potentially slow as we create a new commit log file and apply each transaction to each mapped segment. For any unmapped segments, we copy those ranges to the new log file. Finally, we move the new file to replace the old one. This is somewhat inefficient but is potentially safer. However, when we write to disk, we do not wait to \texttt{fsync} the written bytes to disk. This could mean if the system were to lose power, this data would still be in a filesystem buffer.
 
 \end{document}

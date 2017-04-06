@@ -10,6 +10,8 @@
 struct segment_list segments;
 struct range_list ranges;
 const char *commit_log_file;
+int verbose;
+
 
 void rage_quit(const char* source, const char* error) {
   fprintf(stderr, "%s: %s", source, error);
@@ -43,6 +45,8 @@ char *segname_to_segpath(const char* dir, const char *segname) {
 
 rvm_t rvm_init(const char *directory) {
   rvm_t rvm;
+
+  verbose = 1;
 
   // check if directory exists (or make if not)
   struct stat st;
@@ -90,7 +94,7 @@ void *rvm_map(rvm_t rvm, const char *segname, int size_to_create) {
     
   if (access(seg_path, F_OK) == 0) {
     rvm_truncate_log(rvm);
-    fprintf(stderr, "{'function': 'map', 'found_backing_file': %d}, \n", 1);
+    if (verbose) fprintf(stderr, "{'function': 'map', 'found_backing_file': %d}, \n", 1);
     FILE *segfile = fopen(seg_path, "r");
     // if bigger, extend the segment to fit the newly requested
     // size, padding the extra space with nulls.
@@ -105,7 +109,7 @@ void *rvm_map(rvm_t rvm, const char *segname, int size_to_create) {
     fread(seg.seg_addr, seg.seg_size, 1, segfile);
     fclose(segfile);
   } else {
-    fprintf(stderr, "{'function': 'map', 'found_backing_file': %d}, \n", 0);
+    if (verbose) fprintf(stderr, "{'function': 'map', 'found_backing_file': %d}, \n", 0);
     // create the backing file of appropriate size if
     // it doesn't exist
     int fd = open(seg_path, O_RDWR | O_CREAT, 0770);
@@ -116,7 +120,7 @@ void *rvm_map(rvm_t rvm, const char *segname, int size_to_create) {
   }
 
   free(seg_path);
-  fprintf(stderr, "{'function': 'map', 'segname': %s}, \n", segname);
+  if (verbose) fprintf(stderr, "{'function': 'map', 'segname': %s}, \n", segname);
   return seg.seg_addr;
 }
 
@@ -190,7 +194,7 @@ trans_t rvm_begin_trans(rvm_t rvm, int numsegs, void **segbases) {
     LIST_INSERT_HEAD(&ranges, undo, next_range);
   }
 
-  fprintf(stderr, "{'function': 'begin_trans', 'id': %d}, \n", trans_id);
+  if (verbose) fprintf(stderr, "{'function': 'begin_trans', 'id': %d}, \n", trans_id);
   return trans_id;
 }
 
@@ -214,7 +218,7 @@ void rvm_about_to_modify(trans_t tid, void *segbase, int offset, int size) {
   range->segname = seg->seg_name;
   range->namesize = strlen(range->segname);
   LIST_INSERT_HEAD(&ranges, range, next_range);
-  fprintf(stderr, "{'function': 'about_to_modify', 'id': %d, 'segbase': %p, 'offset': %d, 'size': %d}, \n", tid, segbase, offset, size);
+  if (verbose) fprintf(stderr, "{'function': 'about_to_modify', 'id': %d, 'segbase': %p, 'offset': %d, 'size': %d}, \n", tid, segbase, offset, size);
 }
 
 void rvm_commit_trans(trans_t tid) {
@@ -229,7 +233,7 @@ void rvm_commit_trans(trans_t tid) {
       LIST_REMOVE(i, next_range);
       if(!i->is_undo) {
         // not an undo record, should write to logfile
-        fprintf(stderr, "{'function': 'commit_trans', 'range->size': %d}, \n", i->size);
+        if (verbose) fprintf(stderr, "{'function': 'commit_trans', 'range->size': %d}, \n", i->size);
         fwrite(i, sizeof(range_t), 1, logfile);
         fwrite(i->segname, i->namesize, 1, logfile);
         memcpy(i->data, i->segbase + i->offset, i->size);
@@ -255,7 +259,7 @@ void rvm_commit_trans(trans_t tid) {
   }
 
   fclose(logfile);
-  fprintf(stderr, "{'function': 'commit_trans', 'id': %d}, \n", tid);
+  if (verbose) fprintf(stderr, "{'function': 'commit_trans', 'id': %d}, \n", tid);
 }
 
 void rvm_abort_trans(trans_t tid) {
@@ -316,7 +320,7 @@ void rvm_truncate_log(rvm_t rvm) {
         fwrite(&range, sizeof(range_t), 1, logfile);
         fseek(logfile, sizeof(range_t) + range.size + range.namesize, SEEK_CUR);
 
-        fprintf(stderr, "{'function': 'truncate', 'id': %d, 'segbase': %p, 'offset': %d, 'size': %d}, \n",
+        if (verbose) fprintf(stderr, "{'function': 'truncate', 'id': %d, 'segbase': %p, 'offset': %d, 'size': %d}, \n",
                 range.tid, range.segbase, range.offset, range.size);
       } else {
         // segment not mapped, but not backed, so must move
@@ -335,5 +339,5 @@ void rvm_truncate_log(rvm_t rvm) {
 }
 
 void rvm_verbose(int enable_flag) {
-
+  verbose = enable_flag;
 }

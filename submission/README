@@ -1,0 +1,13 @@
+# Recoverable Virtual Memory
+By Paras Jain and Manas George
+
+Compilation
+===========
+  1.  Run `mkdir bin`
+  2.  Run `make clean`
+  3.  Run `make all`
+  4.  Each testcase (with RVM linked into the binary) will be in the bin directory
+
+Analysis and report
+===================
+See report.pdf
